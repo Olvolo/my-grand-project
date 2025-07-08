@@ -1,0 +1,178 @@
+Краткая инструкция по созданию основы проекта Laravel
+Вот пошаговая инструкция по настройке вашей основы проекта Laravel с MySQL, Tailwind CSS v4 и Vite.
+1. Подготовка окружения и создание проекта
+Убедитесь, что установлены:
+
+Composer: Менеджер зависимостей PHP.
+
+Node.js и npm (или Yarn): Для фронтенд-инструментов. Рекомендуется использовать LTS-версию Node.js.
+
+PHP: Версии 8.2 или выше.
+
+Сервер базы данных (MySQL/PostgreSQL): Убедитесь, что ваш сервер запущен.
+
+Создайте новый проект Laravel:
+
+Bash
+
+composer create-project laravel/laravel my-grand-project
+cd my-grand-project
+На вопрос Do you want to remove the existing VCS (.git, .svn..) history? [Y,n]? ответьте Y (Yes).
+
+2. Настройка базы данных
+Создайте пустую базу данных на вашем сервере MySQL/PostgreSQL. Например, my_grand_project_db.
+
+Через phpMyAdmin:
+
+Зайдите в http://localhost/phpmyadmin.
+
+Перейдите на вкладку "Базы данных".
+
+В поле "Имя базы данных" введите my_grand_project_db, выберите "Сопоставление" (Collation) utf8mb4_unicode_ci и нажмите "Создать".
+
+Через DBeaver:
+
+Подключитесь к вашему серверу.
+
+В "Database Navigator" кликните правой кнопкой мыши по "Catalogs" (MySQL) или "Databases" (PostgreSQL) и выберите "Create New" -> "Database".
+
+Введите имя my_grand_project_db и выберите соответствующие кодировки (utf8mb4 для MySQL, UTF8 для PostgreSQL).
+
+Через консоль MySQL:
+
+Bash
+
+mysql -u root -p
+CREATE DATABASE my_grand_project_db CHARACTER SET utf8mb4 COLLATE utf8mb8_unicode_ci;
+EXIT;
+Через консоль PostgreSQL:
+
+Bash
+
+psql -U postgres
+CREATE DATABASE my_grand_project_db;
+\q
+Настройте файл .env в корне вашего Laravel проекта (my-grand-project/.env):
+
+Укажите параметры подключения к вашей базе данных.
+
+Для MySQL:
+
+Фрагмент кода
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=my_grand_project_db
+DB_USERNAME=your_mysql_username
+DB_PASSWORD=your_mysql_password
+Для PostgreSQL:
+
+Фрагмент кода
+
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=my_grand_project_db
+DB_USERNAME=your_pgsql_username
+DB_PASSWORD=your_pgsql_password
+Включите PHP-расширения для вашей СУБД:
+
+Найдите ваш файл php.ini (используйте php --ini в терминале).
+
+Раскомментируйте (удалите ;) соответствующие строки:
+
+Для MySQL: extension=pdo_mysql
+
+Для PostgreSQL: extension=pdo_pgsql
+
+Сохраните php.ini и перезапустите веб-сервер/PHP-FPM/CLI-сервис.
+
+Запустите миграции Laravel:
+
+Bash
+
+php artisan migrate
+Это создаст необходимые системные таблицы Laravel (users, sessions и т.д.) в вашей базе данных.
+
+3. Настройка Tailwind CSS v4 и Vite
+Установите Tailwind CSS v4 и его плагины:
+
+В корневой директории проекта (my-grand-project):
+
+Bash
+
+# Сначала очистите кэш, если были проблемы ранее
+npm cache clean --force
+# Удалите папку node_modules и package-lock.json вручную, если они существуют
+# Затем переустановите зависимости:
+npm install
+(Если у вас возникли проблемы с npx tailwindcss init -p из-за версии v4, эти шаги с переустановкой пакетов должны были помочь).
+
+Настройте vite.config.js:
+
+Откройте vite.config.js в корне проекта.
+
+Убедитесь, что он содержит плагин @tailwindcss/vite:
+
+JavaScript
+
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+import tailwindcss from '@tailwindcss/vite'; // <--- Важно!
+
+export default defineConfig({
+    plugins: [
+        laravel({
+            input: ['resources/css/app.css', 'resources/js/app.js'],
+            refresh: true,
+        }),
+        tailwindcss(), // <--- Важно!
+    ],
+});
+Настройте resources/css/app.css:
+
+Удалите любой существующий tailwind.config.js файл, если он есть (v4 его не использует).
+
+Откройте resources/css/app.css и убедитесь, что его содержимое выглядит так:
+
+CSS
+
+/* resources/css/app.css */
+
+/* 1. Import Preflight (MUST be at the very top) */
+@import "tailwindcss/preflight";
+
+/* 2. Define your content sources */
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/* 3. Import Tailwind's utility classes */
+@tailwind utilities;
+
+/* 4. Define your theme customizations */
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+4. Запуск проекта
+Запустите сервер разработки Vite:
+
+Bash
+
+npm run dev
+Запустите встроенный сервер Laravel:
+
+Откройте новое окно терминала/PowerShell (оставьте npm run dev работать).
+
+Перейдите в директорию проекта: cd my-grand-project
+
+Выполните:
+
+Bash
+
+php artisan serve
+Откройте проект в браузере:
+Перейдите по адресу http://127.0.0.1:8000 (или другому адресу, который покажет Artisan). Вы должны увидеть стартовую страницу Laravel, стилизованную с помощью Tailwind CSS.

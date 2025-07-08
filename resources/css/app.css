@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for elements within prose, especially for footnotes and tables */
+.prose {
+    /* Общие настройки для лучшей читаемости */
+    font-size: 1.125rem; /* text-lg */
+    line-height: 1.75rem; /* leading-relaxed */
+    color: #374151; /* gray-700 */
+
+    /* Стилизация сносок */
+    .footnote-ref {
+        @apply text-indigo-600 no-underline hover:underline; /* Синяя ссылка, без подчеркивания, при наведении подчеркивание */
+        vertical-align: super; /* Поднимает сноску над текстом */
+        font-size: 0.75em; /* Делает её чуть меньше */
+        margin-left: 0.1em; /* Небольшой отступ */
+    }
+    .footnote-backref {
+        @apply text-gray-500 no-underline hover:text-gray-700; /* Стиль для ссылки "обратно к тексту" */
+        font-size: 0.9em;
+        margin-left: 0.5em;
+    }
+    .footnotes {
+        @apply text-sm mt-8 pt-4 border-t border-gray-300; /* Базовый стиль для блока сносок */
+        ol {
+            @apply list-decimal pl-6; /* Нумерованный список */
+        }
+        li {
+            @apply mb-2; /* Отступ между сносками */
+        }
+    }
+
+    /* Стилизация таблиц */
+    table {
+        @apply w-full border-collapse table-auto my-6; /* Ширина 100%, коллапс границ */
+    }
+    th, td {
+        @apply px-4 py-2 text-left border border-gray-300; /* Отступы, границы */
+    }
+    th {
+        @apply bg-gray-100 font-semibold text-gray-800; /* Фон для заголовков */
+    }
+    tr:nth-child(even) {
+        @apply bg-gray-50; /* Чередующийся фон для строк */
+    }
+    tr:hover {
+        @apply bg-gray-100; /* Фон при наведении */
+    }
+
+}

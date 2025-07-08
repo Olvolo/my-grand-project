@@ -1,0 +1,11 @@
+1. Для метки скрыто для каждой главы в списке оглавления:
+
+<li class="flex items-center text-lg text-gray-800 hover:text-indigo-700 transition duration-200">
+        <span class="font-semibold w-8 text-right mr-2">{{ $chapter->order }}.</span>
+        <a href="{{ route('books.chapters.show', [$book, $chapter]) }}" class="flex-grow">
+            {{ $chapter->title }}
+        </a>
+        @if ($chapter->is_hidden)
+            <span class="ml-2 px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">Скрыто</span>
+        @endif
+    </li>
