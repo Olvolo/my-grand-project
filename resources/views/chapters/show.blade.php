@@ -13,7 +13,7 @@
 
         {{-- Основное содержимое главы, обёрнутое в "prose" для стилизации --}}
         <div class="prose lg:prose-lg xl:prose-xl max-w-none text-gray-800 leading-relaxed">
-            {!! $chapter->content !!}
+            {!! $chapter->content_html !!}
         </div>
 
         <hr class="my-6 border-gray-300">

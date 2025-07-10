@@ -29,7 +29,7 @@
         </header>
 
         <div class="prose max-w-none lg:prose-lg">
-            <?php echo $article->content; ?>
+            <?php echo $article->content_html; ?>
 
         </div>
 

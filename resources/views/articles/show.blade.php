@@ -30,7 +30,7 @@
         </header>
 
         <div class="prose max-w-none lg:prose-lg">
-            {!! $article->content !!}
+            {!! $article->content_html !!}
         </div>
 
         @if ($article->tags->isNotEmpty())

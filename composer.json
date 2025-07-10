@@ -13,6 +13,7 @@
         "laravel/tinker": "^2.9",
         "league/commonmark": "^2.7",
         "league/flysystem": "^3.30",
+        "league/html-to-markdown": "^5.1",
         "meilisearch/meilisearch-php": "^1.15",
         "nunomaduro/termwind": "^2.0",
         "spatie/laravel-ignition": "^2.4",

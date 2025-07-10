@@ -16,7 +16,8 @@ use Illuminate\Support\Str;
  * @property int $book_id
  * @property string $title
  * @property string $slug
- * @property string $content
+ * @property string|null $content_html
+ * @property string|null $content_markdown
  * @property int $order
  * @property bool $is_hidden
  * @property Carbon|null $created_at
@@ -49,7 +50,8 @@ class Chapter extends Model
         'book_id',
         'title',
         'slug',
-        'content',
+        'content_html',
+        'content_markdown',
         'order',
         'is_hidden',
     ];

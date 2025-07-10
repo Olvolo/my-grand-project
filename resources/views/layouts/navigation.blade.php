@@ -40,6 +40,10 @@
                         {{ __('Статьи') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('contacts')" :active="request()->routeIs('contacts')">
+                        {{ __('Контакты') }}
+                    </x-nav-link>
+
                     @auth
                         {{-- Если пользователь АДМИН, показываем ссылку на Админ-панель --}}
                         @if (Auth::user()->is_admin)
@@ -77,8 +81,7 @@
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <x-dropdown-link :href="route('logout')"
-                                                 onclick="event.preventDefault();
-                                                    this.closest('form').submit();">
+                                                 @click.prevent="$el.closest('form').submit()">
                                     {{ __('Выход') }}
                                 </x-dropdown-link>
                             </form>
@@ -120,6 +123,10 @@
             <x-responsive-nav-link :href="route('articles.index')" :active="request()->routeIs('articles.index')">
                 {{ __('Статьи') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('contacts')" :active="request()->routeIs('contacts')">
+                {{ __('Контакты') }}
+            </x-responsive-nav-link>
+
             @auth
                 {{-- Если пользователь АДМИН, показываем ссылку на Админ-панель --}}
                 @if (Auth::user()->is_admin)
@@ -154,8 +161,7 @@
                         @csrf
 
                         <x-responsive-nav-link :href="route('logout')"
-                                               onclick="event.preventDefault();
-                                        this.closest('form').submit();">
+                                               @click.prevent="$el.closest('form').submit()">
                             {{ __('Выход') }}
                         </x-responsive-nav-link>
                     </form>

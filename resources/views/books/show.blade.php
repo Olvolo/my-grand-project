@@ -42,11 +42,21 @@
         @if ($book->chapters->isNotEmpty())
             <ul class="space-y-2">
                 @foreach ($book->chapters as $chapter)
-                    <li class="flex items-center text-lg text-gray-800 hover:text-indigo-700 transition duration-200">
-                        <span class="font-semibold w-8 text-right mr-2">{{ $chapter->order }}.</span>
-                        <a href="{{ route('books.chapters.show', [$book, $chapter]) }}" class="flex-grow">
+                    <li class="flex items-center justify-between text-lg text-gray-800 transition duration-200">
+                        <a href="{{ route('books.chapters.show', [$book, $chapter]) }}" class="flex-grow hover:text-indigo-700">
+                            <span class="font-semibold w-8 text-right mr-2">{{ $chapter->order }}.</span>
                             {{ $chapter->title }}
                         </a>
+
+                        {{-- ДОБАВЛЯЕМ ССЫЛКУ ДЛЯ АДМИНА --}}
+                        @auth
+                            @php($user = auth()->user())
+                            @if($user instanceof \App\Models\User && $user->is_admin)
+                                <a href="{{ route('admin.chapters.edit', $chapter) }}" class="ml-4 text-sm text-blue-600 hover:underline">
+                                    (Редактировать)
+                                </a>
+                            @endif
+                        @endauth
                     </li>
                 @endforeach
             </ul>

@@ -34,6 +34,7 @@
     30 => 'Pest\\Laravel\\PestServiceProvider',
     31 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
     32 => 'App\\Providers\\AppServiceProvider',
+    33 => 'App\\Providers\\MarkdownServiceProvider',
   ),
   'eager' => 
   array (
@@ -210,6 +211,7 @@
     'Laravel\\Sail\\Console\\InstallCommand' => 'Laravel\\Sail\\SailServiceProvider',
     'Laravel\\Sail\\Console\\PublishCommand' => 'Laravel\\Sail\\SailServiceProvider',
     'command.tinker' => 'Laravel\\Tinker\\TinkerServiceProvider',
+    'League\\CommonMark\\MarkdownConverter' => 'App\\Providers\\MarkdownServiceProvider',
   ),
   'when' => 
   array (
@@ -259,6 +261,9 @@
     array (
     ),
     'Laravel\\Tinker\\TinkerServiceProvider' => 
+    array (
+    ),
+    'App\\Providers\\MarkdownServiceProvider' => 
     array (
     ),
   ),

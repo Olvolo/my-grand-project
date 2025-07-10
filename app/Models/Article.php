@@ -17,7 +17,8 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $title
  * @property string $slug
- * @property string $content // Убедитесь, что это свойство есть в PHPDoc
+ * @property string|null $content_html
+ * @property string|null $content_markdown
  * @property Carbon|null $published_at
  * @property bool $is_hidden
  * @property int|null $category_id
@@ -60,7 +61,8 @@ class Article extends Model
     protected $fillable = [
         'title',
         'slug',
-        'content',
+        'content_html',
+        'content_markdown',
         'published_at',
         'is_hidden',
         'category_id',
@@ -116,4 +118,6 @@ class Article extends Model
     {
         return $this->belongsToMany(Tag::class, 'article_tag', 'article_id', 'tag_id');
     }
+
+
 }
