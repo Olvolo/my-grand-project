@@ -2,76 +2,69 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Author; // Импортируем модель Author
-use Illuminate\Http\Request;
+use App\Models\Author;
+use Illuminate\View\View;
 
 class AuthorController extends Controller
 {
     /**
-     * Display a listing of the authors.
+     * Display a listing of all authors.
      */
-    public function index()
+    public function index(): View
     {
-        // Получаем всех авторов, сортируем по имени
-        // Можно добавить пагинацию, если авторов будет очень много: ->paginate(15)
-        $authors = Author::orderBy('name')->get();
-
-        // TODO: Покажем всех авторов на странице 'authors.index'
-        // return view('authors.index', compact('authors'));
-
-        // Получаем всех авторов, сортируем по имени
-// Жадная загрузка книг и статей для отображения их количества
-        $authors = Author::orderBy('name')
-            ->withCount(['books', 'articles']) // Добавляем подсчет связанных записей
+        // Добавляем ::query() чтобы анализатор не выдавал предупреждение
+        $authors = Author::query()->orderBy('name')
+            ->withCount(['books', 'articles'])
             ->get();
 
         return view('authors.index', compact('authors'));
     }
 
     /**
-     * Display the specified author.
+     * Display the author's main hub/gateway page.
      */
-    public function show(Author $author)
+    public function show(Author $author): View
     {
-        // Благодаря Route Model Binding (/{author:slug} в роуте),
-        // Laravel автоматически найдет автора по его slug и передаст сюда готовый объект $author.
+        return view('authors.show', compact('author'));
+    }
 
-        // Загружаем книги и статьи автора
-        // Используем with() для жадной загрузки отношений, чтобы избежать N+1 проблемы
-        $author->load(['books.chapters', 'articles']);
+    /**
+     * Display the author's biography page.
+     */
+    public function showBio(Author $author): View
+    {
+        return view('authors.bio', compact('author'));
+    }
 
-        // Для Учителя можем добавить проверку и вывести дополнительную информацию
-        if ($author->is_teacher) {
-            $teacherInfo = "Это страница Учителя!";
-        } else {
-            $teacherInfo = "";
-        }
+    /**
+     * Display a list of the author's books.
+     */
+    public function showBooks(Author $author): View
+    {
+        // Оборачиваем scope в замыкание
+        $books = $author->books()
+            ->where(function ($query) {
+                $query->visible();
+            })
+            ->orderBy('publication_year')
+            ->paginate(15);
 
-        // TODO: Покажем детальный профиль автора на странице 'authors.show'
-        // return view('authors.show', compact('author', 'teacherInfo'));
+        return view('authors.books', compact('author', 'books'));
+    }
 
-        // Для начала, просто выведем информацию об авторе для проверки
-        $output = "<h1>Профиль автора: {$author->name}</h1>";
-        $output .= "<p>Биография: " . ($author->bio ?? 'Нет биографии.') . "</p>";
-        $output .= "<p>Учитель: " . ($author->is_teacher ? 'Да' : 'Нет') . "</p>";
-        $output .= "{$teacherInfo}";
+    /**
+     * Display a list of the author's articles.
+     */
+    public function showArticles(Author $author): View
+    {
+        // Оборачиваем scope в замыкание
+        $articles = $author->articles()
+            ->where(function ($query) {
+                $query->visible();
+            })
+            ->orderBy('published_at', 'desc')
+            ->paginate(15);
 
-        if ($author->books->isNotEmpty()) {
-            $output .= "<h2>Книги:</h2><ul>";
-            foreach ($author->books as $book) {
-                $output .= "<li><a href=\"/books/{$book->slug}\">{$book->title}</a> (" . $book->chapters->count() . " глав)</li>";
-            }
-            $output .= "</ul>";
-        }
-
-        if ($author->articles->isNotEmpty()) {
-            $output .= "<h2>Статьи:</h2><ul>";
-            foreach ($author->articles as $article) {
-                $output .= "<li><a href=\"/articles/{$article->slug}\">{$article->title}</a></li>";
-            }
-            $output .= "</ul>";
-        }
-
-        return $output;
+        return view('authors.articles', compact('author', 'articles'));
     }
 }

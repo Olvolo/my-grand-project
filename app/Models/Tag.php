@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
 
 /**
  * @property int $id
@@ -45,21 +44,6 @@ class Tag extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
-
-    /**
-     * Automatically generate a slug from the name if not provided.
-     *
-     * @param string $value
-     * @return void
-     */
-    public function setNameAttribute(string $value): void
-    {
-        $this->attributes['name'] = $value;
-        // Генерируем slug, если он не установлен явно
-        if (empty($this->attributes['slug'])) {
-            $this->attributes['slug'] = Str::slug($value);
-        }
-    }
 
     /**
      * Get the route key for the model.

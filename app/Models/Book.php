@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\VisibleScope;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
 
 /**
  * @property int $id
@@ -27,7 +27,10 @@ use Illuminate\Support\Str;
  * @property-read int|null $authors_count
  * @property-read Collection<int, Chapter> $chapters
  * @property-read int|null $chapters_count
+ * @property-read Collection<int, Chapter> $visibleChapters
+ * @property-read int|null $visible_chapters_count
  *
+ * @method static Builder|Book visible()
  * @method static Builder|Book newModelQuery()
  * @method static Builder|Book newQuery()
  * @method static Builder|Book query()
@@ -48,7 +51,7 @@ use Illuminate\Support\Str;
  */
 class Book extends Model
 {
-    use HasFactory;
+    use HasFactory, VisibleScope;
 
     protected $fillable = [
         'title',
@@ -91,11 +94,21 @@ class Book extends Model
     }
 
     /**
-     * Get the chapters for the Book.
+     * Get all chapters for the Book (used in eager loading and for admin).
      */
     public function chapters(): HasMany
     {
-        // Здесь мы используем orderBy('order') для обеспечения правильной сортировки глав.
         return $this->hasMany(Chapter::class)->orderBy('order');
+    }
+
+    /**
+     * Get visible chapters for the Book based on user authentication.
+     */
+    public function visibleChapters(): HasMany
+    {
+        return $this->chapters()
+            ->when(!auth()->check(), function ($query) {
+                $query->where('is_hidden', false);
+            });
     }
 }

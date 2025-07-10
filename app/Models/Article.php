@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Laravel\Scout\Searchable;
+use App\Models\Traits\VisibleScope;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +12,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 
-use Illuminate\Support\Str;
 
 /**
  * @property int $id
@@ -29,6 +30,7 @@ use Illuminate\Support\Str;
  * @property-read Collection<int, Tag> $tags
  * @property-read int|null $tags_count
  *
+ * @method static Builder|Article visible()
  * @method static Builder|Article newModelQuery()
  * @method static Builder|Article newQuery()
  * @method static Builder|Article query()
@@ -48,7 +50,7 @@ use Illuminate\Support\Str;
  */
 class Article extends Model
 {
-    use HasFactory;
+    use HasFactory, VisibleScope, Searchable;
 
     /**
      * The attributes that are mass assignable.

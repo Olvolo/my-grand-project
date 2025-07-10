@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AdminController extends Controller
 {
-    public function index()
+    /**
+     * Display the admin dashboard.
+     * 2. Добавляем тип возвращаемого значения -> : View
+     */
+    public function index(): View
     {
-        // Это будет страница дашборда администратора
         return view('admin.dashboard');
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Laravel\Scout\Searchable;
+use App\Models\Traits\VisibleScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,6 +23,7 @@ use Illuminate\Support\Str;
  * @property Carbon|null $updated_at
  * @property-read Book $book
  *
+ * @method static Builder|Chapter visible()
  * @method static Builder|Chapter newModelQuery()
  * @method static Builder|Chapter newQuery()
  * @method static Builder|Chapter query()
@@ -35,12 +38,12 @@ use Illuminate\Support\Str;
  * @method static Builder|Chapter whereUpdatedAt($value)
  * @method static Builder|Chapter create(array $attributes = [])
  * @method static Builder|Chapter where(string $column, string $operator = null, mixed $value = null)
- * @method static Builder|Chapter firstOrCreate(array $attributes, array $values = []) // Добавлено для firstOrCreate
+ * @method static Builder|Chapter firstOrCreate(array $attributes, array $values = [])
  * @mixin Builder
  */
 class Chapter extends Model
 {
-    use HasFactory;
+    use HasFactory, VisibleScope, Searchable;
 
     protected $fillable = [
         'book_id',
@@ -56,17 +59,47 @@ class Chapter extends Model
     ];
 
     /**
-     * Automatically generate a slug from the title if not provided.
+     * Bootstrap model events.
      *
-     * @param string $value
      * @return void
      */
-    public function setTitleAttribute(string $value): void
+    protected static function booted(): void
     {
-        $this->attributes['title'] = $value;
-        if (empty($this->attributes['slug'])) {
-            $this->attributes['slug'] = Str::slug($value);
+        static::creating(function (Chapter $chapter) {
+            if (empty($chapter->slug)) {
+                $chapter->slug = static::generateUniqueSlug($chapter->title, $chapter->book_id);
+            }
+        });
+
+        static::updating(function (Chapter $chapter) {
+            if ($chapter->isDirty('title') && empty($chapter->slug)) {
+                $chapter->slug = static::generateUniqueSlug($chapter->title, $chapter->book_id, $chapter->id);
+            }
+        });
+    }
+
+    /**
+     * Generate a unique slug for the given title and book.
+     *
+     * @param string $title
+     * @param int $bookId
+     * @param int|null $excludeId
+     * @return string
+     */
+    private static function generateUniqueSlug(string $title, int $bookId, ?int $excludeId = null): string
+    {
+        $slug = Str::slug($title);
+        $originalSlug = $slug;
+        $counter = 1;
+
+        while (static::where('slug', $slug)
+            ->where('book_id', $bookId)
+            ->when($excludeId, fn($query) => $query->where('id', '!=', $excludeId))
+            ->exists()) {
+            $slug = $originalSlug . '-' . $counter++;
         }
+
+        return $slug;
     }
 
     /**
@@ -99,7 +132,8 @@ class Chapter extends Model
      */
     public function nextChapter(): ?Chapter
     {
-        return static::where('book_id', $this->book_id)
+        return static::visible()
+            ->where('book_id', $this->book_id)
             ->where('order', '>', $this->order)
             ->orderBy('order')
             ->first();
@@ -110,7 +144,8 @@ class Chapter extends Model
      */
     public function previousChapter(): ?Chapter
     {
-        return static::where('book_id', $this->book_id)
+        return static::visible()
+            ->where('book_id', $this->book_id)
             ->where('order', '<', $this->order)
             ->orderBy('order', 'desc')
             ->first();

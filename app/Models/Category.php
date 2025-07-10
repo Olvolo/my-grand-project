@@ -28,8 +28,8 @@ use Illuminate\Support\Str;
  * @method static Builder|Category whereCreatedAt($value)
  * @method static Builder|Category whereUpdatedAt($value)
  * @method static Builder|Category firstOrCreate(array $attributes, array $values = [])
- * @method static Builder|Category create(array $attributes = []) // PHPDoc для create
- * @method static Builder|Category where(string $column, string $operator = null, mixed $value = null) // PHPDoc для where
+ * @method static Builder|Category create(array $attributes = [])
+ * @method static Builder|Category where(string $column, string $operator = null, mixed $value = null)
  * @mixin Builder
  */
 class Category extends Model
@@ -41,29 +41,45 @@ class Category extends Model
         'slug',
     ];
 
-    protected $casts = [
-        // Здесь могут быть дополнительные приведения типов, если нужны
-    ];
+    /**
+     * Bootstrap model events.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (Category $category) {
+            if (empty($category->slug)) {
+                $category->slug = static::generateUniqueSlug($category->name);
+            }
+        });
+
+        static::updating(function (Category $category) {
+            if ($category->isDirty('name') && empty($category->slug)) {
+                $category->slug = static::generateUniqueSlug($category->name, $category->id);
+            }
+        });
+    }
 
     /**
-     * Automatically generate a slug from the name if not provided.
-     *
-     * @param string $value
-     * @return void
+     * Generate a unique slug for the given name.
      */
-    public function setNameAttribute(string $value): void
+    private static function generateUniqueSlug(string $name, ?int $excludeId = null): string
     {
-        $this->attributes['name'] = $value;
-        if (empty($this->attributes['slug'])) {
-            $this->attributes['slug'] = Str::slug($value);
+        $slug = Str::slug($name);
+        $originalSlug = $slug;
+        $counter = 1;
+
+        while (static::where('slug', $slug)
+            ->when($excludeId, fn($query) => $query->where('id', '!=', $excludeId))
+            ->exists()) {
+            $slug = $originalSlug . '-' . $counter++;
         }
+
+        return $slug;
     }
 
     /**
      * Get the route key for the model.
      * Используем slug вместо ID для маршрутов
-     *
-     * @return string
      */
     public function getRouteKeyName(): string
     {
@@ -78,8 +94,9 @@ class Category extends Model
 
     /**
      * Get the articles for the category.
+     * Used in CategoryController and for eager loading.
      */
-    public function articles(): HasMany // <-- ЭТОТ МЕТОД НУЖЕН
+    public function articles(): HasMany
     {
         return $this->hasMany(Article::class);
     }

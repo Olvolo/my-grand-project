@@ -46,7 +46,10 @@ Route::middleware('auth')->group(function () {
 // Маршруты для Авторов
 Route::prefix('authors')->name('authors.')->group(function () {
     Route::get('/', [AuthorController::class, 'index'])->name('index');
-    Route::get('/{author:slug}', [AuthorController::class, 'show'])->name('show');
+    Route::get('/{author:slug}', [AuthorController::class, 'show'])->name('show'); // <-- Это теперь наш хаб
+    Route::get('/{author:slug}/bio', [AuthorController::class, 'showBio'])->name('bio'); // <-- Новая страница для биографии
+    Route::get('/{author:slug}/books', [AuthorController::class, 'showBooks'])->name('books'); // <-- Новая страница для списка книг
+    Route::get('/{author:slug}/articles', [AuthorController::class, 'showArticles'])->name('articles'); // <-- Новая страница для списка статей
 });
 
 // Маршруты для Книг
