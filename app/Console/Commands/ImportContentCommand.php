@@ -2,229 +2,213 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Article;
+use App\Models\Author;
+use App\Models\Book;
+use App\Models\Category;
+use App\Models\Tag;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use Spatie\YamlFrontMatter\YamlFrontMatter; // <-- 1. Добавляем use
-use Symfony\Component\Console\Command\Command as CommandAlias;
-
-// ... (остальные use для моделей)
-use App\Models\Author;
-use App\Models\Book;
-use App\Models\Article;
-use App\Models\Category;
-use App\Models\Tag;
-use App\Models\Chapter;
-
-// ... (остальные use для CommonMark)
+use League\CommonMark\Exception\CommonMarkException;
 use League\CommonMark\MarkdownConverter;
-// ... (здесь можно убрать лишние use, если они не нужны напрямую)
-use League\CommonMark\CommonMarkConverter;
-use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
-use League\CommonMark\Extension\Footnote\FootnoteExtension;
-use League\CommonMark\Extension\Table\TableExtension;
-use League\CommonMark\Environment\Environment;
-
+use Spatie\YamlFrontMatter\YamlFrontMatter;
 
 class ImportContentCommand extends Command
 {
     /**
-     * 2. Упрощаем сигнатуру. Теперь нужен только путь к файлу!
+     * Сигнатура команды стала проще, теперь нужен только путь к файлу.
      */
-    protected $signature = 'app:import-content
-                            {filePath : The path to the Markdown file}
-                            {--debug : Enable debug mode to see conversion details}';
-
-    protected $description = 'Imports or updates content from a Markdown file with YAML Front Matter.';
-
-    protected MarkdownConverter $markdownConverter;
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    // Метод createMarkdownConverter остается без изменений...
-    protected function createMarkdownConverter(): MarkdownConverter
-    {
-        // ... (весь ваш код для создания конвертера)
-        $config = [
-            'html_input' => 'strip',
-            'allow_unsafe_links' => false,
-            'max_nesting_level' => 100,
-            // Конфигурация для сносок
-            'footnote' => [
-                'backref_class' => 'footnote-backref',
-                'backref_symbol' => '↩',
-                'container_add_hr' => true,
-                'container_class' => 'footnotes',
-                'ref_class' => 'footnote-ref',
-                'ref_id_prefix' => 'fnref:',
-                'footnote_class' => 'footnote',
-                'footnote_id_prefix' => 'fn:',
-            ],
-            // Конфигурация для таблиц
-            'table' => [
-                'wrap' => [
-                    'enabled' => false,
-                    'tag' => 'div',
-                    'attributes' => [],
-                ],
-                'alignment_attributes' => [
-                    'left' => ['align' => 'left'],
-                    'center' => ['align' => 'center'],
-                    'right' => ['align' => 'right'],
-                ],
-            ],
-        ];
-
-        // Создаем окружение
-        $environment = new Environment($config);
-
-        // Добавляем расширения
-        $environment->addExtension(new CommonMarkCoreExtension());
-        $environment->addExtension(new TableExtension());
-        $environment->addExtension(new FootnoteExtension());
-
-        // Используем MarkdownConverter вместо CommonMarkConverter
-        return new MarkdownConverter($environment);
-    }
-
+    protected $signature = 'app:import-content {filePath : The path to the Markdown file}';
 
     /**
-     * Executes the console command.
+     * Описание команды.
      */
-    public function handle(): int
+    protected $description = 'Imports or updates content from a Markdown file with YAML Front Matter.';
+
+    /**
+     * Основной метод, который выполняет команду.
+     * Мы используем dependency injection, чтобы Laravel сам предоставил нам настроенный MarkdownConverter.
+     * @throws CommonMarkException
+     */
+    public function handle(MarkdownConverter $converter): int
     {
-        $this->markdownConverter = $this->createMarkdownConverter();
         $filePath = $this->argument('filePath');
 
         if (!File::exists($filePath)) {
             $this->error("Файл не найден по пути: $filePath");
-            return CommandAlias::FAILURE;
+            return self::FAILURE;
         }
 
         try {
-            // 3. Парсим файл с помощью YamlFrontMatter
+            // Парсим файл, чтобы отделить метаданные (Front Matter) от основного текста
             $document = YamlFrontMatter::parse(File::get($filePath));
 
-            // Определяем тип контента по наличию ключей в метаданных
-            // Например, если есть 'chapters' или 'publisher', считаем это книгой.
-            $type = $document->matter('publisher') || $document->matter('year') ? 'book' : 'article';
+            // Определяем, импортируем мы книгу или статью, по наличию поля 'publisher'
+            $type = $document->matter('publisher') ? 'book' : 'article';
 
             if ($type === 'book') {
-                return $this->importBook($document);
+                $this->importBook($document, $converter);
+            } else {
+                $this->importArticle($document, $converter);
             }
 
-            return $this->importArticle($document);
-
         } catch (Exception $e) {
-            $this->error("Произошла ошибка: " . $e->getMessage());
-            $this->error("Файл: " . $e->getFile() . " на строке: " . $e->getLine());
-            return CommandAlias::FAILURE;
+            $this->error("Произошла критическая ошибка: " . $e->getMessage());
+            $this->error("Файл: " . $e->getFile() . ", строка: " . $e->getLine());
+            return self::FAILURE;
         }
+
+        return self::SUCCESS;
     }
 
     /**
-     * 4. Обновляем метод importArticle. Теперь он принимает объект Document.
+     * Импортирует или обновляет статью.
+     * @throws CommonMarkException
      */
-    protected function importArticle(\Spatie\YamlFrontMatter\Document $document): int
+    protected function importArticle(object $document, MarkdownConverter $converter): void
     {
-        // Получаем все метаданные из документа
-        $title = $document->matter('title');
-        $authorNames = $document->matter('authors', []);
-        $isHidden = $document->matter('is_hidden', false);
-        $publishedAt = $document->matter('published_at');
-        $categoryName = $document->matter('category');
-        $tagNames = $document->matter('tags', []);
+        $markdownContent = $document->body();
+        $htmlContent = $converter->convert($markdownContent)->getContent();
 
-        // Тело статьи
-        $articleContentMarkdown = $document->body();
-        $articleContentHtml = $this->markdownConverter->convert($articleContentMarkdown)->getContent();
+        $articleData = [
+            'slug' => Str::slug($document->matter('title')),
+            'content_markdown' => $markdownContent,
+            'content_html' => $htmlContent,
+            'published_at' => $document->matter('published_at', now()),
+            'is_hidden' => $document->matter('is_hidden', false),
+        ];
 
-        $categoryId = null;
-        if ($categoryName) {
-            $category = Category::firstOrCreate(
-                ['name' => trim($categoryName)],
-                ['slug' => Str::slug(trim($categoryName))]
-            );
-            $categoryId = $category->id;
-        }
-
-        $article = Article::updateOrCreate(
-            ['title' => $title], // Условие для поиска
-            [                   // Данные для обновления или создания
-                'slug' => Str::slug($title),
-                'content' => $articleContentHtml,
-                'published_at' => $publishedAt ?? now(),
-                'is_hidden' => $isHidden,
-                'category_id' => $categoryId,
-            ]
+        // Находим или создаём статью
+        /** @var Article $article */
+        $article = Article::query()->updateOrCreate(
+            ['title' => $document->matter('title')],
+            $articleData
         );
 
-        $this->syncAuthors($article, $authorNames);
-        $this->syncTags($article, $tagNames);
+        // Синхронизируем связи
+        $this->syncCategory($article, $document->matter('category'));
+        $this->syncAuthors($article, $document->matter('authors', []));
+        $this->syncTags($article, $document->matter('tags', []));
 
-        $this->info("Статья '{$title}' успешно импортирована/обновлена.");
-        return CommandAlias::SUCCESS;
+        $this->info("Статья '$article->title' успешно импортирована/обновлена.");
     }
 
     /**
-     * Вам нужно будет аналогично обновить метод importBook
-     * Я пока оставлю его пустым, чтобы вы сфокусировались на статьях
-     * Мы можем сделать его вместе следующим шагом.
+     * Импортирует или обновляет книгу и её главы.
+     * @throws CommonMarkException
      */
-    protected function importBook(\Spatie\YamlFrontMatter\Document $document): int
+    protected function importBook(object $document, MarkdownConverter $converter): void
     {
-        $this->warn('Импорт книг пока не реализован с Front Matter. Сделайте это по аналогии со статьями.');
-        // Здесь будет ваша логика для импорта книг
-        return CommandAlias::SUCCESS;
+        $bookData = [
+            'slug' => Str::slug($document->matter('title')),
+            'description' => $converter->convert($document->matter('description', ''))->getContent(),
+            'publication_year' => $document->matter('year'),
+            'publisher' => $document->matter('publisher'),
+            'language' => $document->matter('language', 'ru'),
+            'is_hidden' => $document->matter('is_hidden', false),
+        ];
+
+        // Находим или создаём книгу
+        /** @var Book $book */
+        $book = Book::query()->updateOrCreate(
+            ['title' => $document->matter('title')],
+            $bookData
+        );
+
+        $this->syncAuthors($book, $document->matter('authors', []));
+        $this->info("Книга '$book->title' успешно импортирована/обновлена.");
+
+        // Импортируем главы
+        $this->importChaptersForBook($book, $document->body(), $converter);
     }
 
-    // Методы syncAuthors, syncTags, createMarkdownConverter остаются без изменений...
-    protected function syncAuthors($contentItem, array $authorNames): void
+    /**
+     * Обрабатывает и создаёт главы для книги.
+     * @throws CommonMarkException
+     */
+    protected function importChaptersForBook(Book $book, string $chaptersContent, MarkdownConverter $converter): void
     {
-        if (empty($authorNames)) {
-            $contentItem->authors()->sync([]);
-            $this->warn("Авторы для '{$contentItem->title}' отвязаны (пустой список).");
-            return;
-        }
+        // Удаляем старые главы перед импортом новых, чтобы избежать дубликатов
+        $book->chapters()->delete();
+        $this->warn("Все существующие главы для книги '$book->title' были удалены перед импортом.");
 
+        // Разделяем текст на главы по специальному разделителю
+        $chaptersText = explode('===CHAPTER===', $chaptersContent);
+
+        foreach ($chaptersText as $index => $chapterContent) {
+            $trimmedContent = trim($chapterContent);
+            if (empty($trimmedContent)) {
+                continue;
+            }
+
+            $lines = explode("\n", $trimmedContent);
+            $chapterTitle = trim(array_shift($lines));
+            $chapterBodyMarkdown = implode("\n", $lines);
+            $chapterBodyHtml = $converter->convert($chapterBodyMarkdown)->getContent();
+
+            $book->chapters()->create([
+                'title' => $chapterTitle,
+                'slug' => Str::slug($chapterTitle),
+                'content_markdown' => $chapterBodyMarkdown,
+                'content_html' => $chapterBodyHtml,
+                'order' => $index + 1,
+                'is_hidden' => $book->is_hidden, // Главы наследуют статус видимости от книги
+            ]);
+            $this->info(" -> Добавлена глава #".($index + 1).": $chapterTitle");
+        }
+    }
+
+    /**
+     * Синхронизирует авторов для контента (книги или статьи).
+     */
+    protected function syncAuthors(Article|Book $contentItem, array $authorNames): void
+    {
         $authorIds = [];
         foreach ($authorNames as $authorName) {
-            /** @var \App\Models\Author $author */
-            $author = Author::firstOrCreate(
+            $author = Author::query()->firstOrCreate(
                 ['name' => $authorName],
                 ['slug' => Str::slug($authorName)]
             );
             $authorIds[] = $author->id;
         }
         $contentItem->authors()->sync($authorIds);
-        $this->info("Авторы синхронизированы для '{$contentItem->title}'.");
     }
 
     /**
-     * Syncs tags for a given article.
+     * Синхронизирует теги для статьи.
      */
     protected function syncTags(Article $article, array $tagNames): void
     {
-        if (empty($tagNames)) {
-            $article->tags()->sync([]);
-            $this->warn("Теги для статьи '{$article->title}' отвязаны (пустой список).");
-            return;
-        }
-
         $tagIds = [];
         foreach ($tagNames as $tagName) {
-            /** @var \App\Models\Tag $tag */
-            $tag = Tag::firstOrCreate(
+            $tag = Tag::query()->firstOrCreate(
                 ['name' => $tagName],
                 ['slug' => Str::slug($tagName)]
             );
             $tagIds[] = $tag->id;
         }
         $article->tags()->sync($tagIds);
-        $this->info("Теги синхронизированы для статьи '{$article->title}'.");
+    }
+
+    /**
+     * Синхронизирует категорию для статьи.
+     */
+    protected function syncCategory(Article $article, ?string $categoryName): void
+    {
+        if (is_null($categoryName)) {
+            $article->category()->dissociate();
+            $article->save();
+            return;
+        }
+
+        $category = Category::query()->firstOrCreate(
+            ['name' => trim($categoryName)],
+            ['slug' => Str::slug(trim($categoryName))]
+        );
+
+        $article->category()->associate($category);
+        $article->save();
     }
 }

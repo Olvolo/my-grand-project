@@ -12,9 +12,12 @@
 
                 <div>
                     <label for="title" class="block text-sm font-medium text-gray-700">Название</label>
-                    <input type="text" name="title" id="title" value="{{ old('title') }}" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
+                    <input type="text" name="title" id="title" value="{{ old('title') }}" class="markdown-editor block w-full mt-1 border-gray-300 rounded-md shadow-sm">
                 </div>
-
+                <div>
+                    <label for="order_column" class="block text-sm font-medium text-gray-700">Порядок сортировки</label>
+                    <input type="number" name="order_column" id="order_column" value="{{ old('order_column', $author->order_column ?? 0) }}" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
+                </div>
                 <div>
                     <label for="authors" class="block text-sm font-medium text-gray-700">Авторы</label>
                     <select name="authors[]" id="authors" multiple class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">

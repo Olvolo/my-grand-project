@@ -55,6 +55,7 @@ class ArticleController extends Controller
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
             'is_hidden' => 'nullable|boolean',
+            'order_column' => 'nullable|integer',
         ]);
 
         try {
@@ -67,7 +68,8 @@ class ArticleController extends Controller
                 'content_html' => $htmlContent,
                 'category_id' => $validated['category_id'],
                 'is_hidden' => $request->has('is_hidden'),
-                'published_at' => now(), // Устанавливаем текущую дату как дату публикации
+                'published_at' => now(),
+                'order_column' => $validated['order_column'] ?? 0,
             ]);
 
             $article->authors()->sync($validated['authors']);
@@ -105,6 +107,7 @@ class ArticleController extends Controller
             'authors' => 'required|array',
             'tags.*' => 'exists:tags,id',
             'is_hidden' => 'nullable|boolean',
+            'order_column' => 'nullable|integer',
         ]);
 
         try {
@@ -117,6 +120,7 @@ class ArticleController extends Controller
                 'content_html' => $htmlContent,
                 'category_id' => $validated['category_id'],
                 'is_hidden' => $request->has('is_hidden'),
+                'order_column' => $validated['order_column'] ?? 0,
             ]);
 
             $article->authors()->sync($validated['authors']);

@@ -1,60 +1,52 @@
 <?php $__env->startSection('content'); ?>
-    
-    <div class="py-12 text-center bg-white rounded-lg shadow-lg">
-        <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
-            Сайт Традиции Дандарона
-        </h1>
-        <p class="max-w-md mx-auto mt-3 text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-            Онлайн-архив, посвященный жизни и творческим работам Учителя Бидии Дандаровича Дандарона и его учеников.
-        </p>
-    </div>
-
-    
     <div class="py-12">
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-
             
-            <h2 class="mb-6 text-3xl font-bold text-center text-gray-800">Последние статьи</h2>
-            <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                <?php $__empty_1 = true; $__currentLoopData = $latestArticles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $article): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                    <div class="p-6 transition duration-300 bg-white rounded-lg shadow-md hover:shadow-xl">
-                        <h3 class="mb-2 text-xl font-semibold">
-                            <a href="<?php echo e(route('articles.show', $article)); ?>" class="text-indigo-600 hover:underline">
-                                <?php echo e($article->title); ?>
-
-                            </a>
-                        </h3>
-                        <p class="text-sm text-gray-600">
-                            <?php echo e($article->published_at->format('d.m.Y')); ?>
-
-                        </p>
-                    </div>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                    <p class="text-center text-gray-500 md:col-span-3">Статей пока нет.</p>
-                <?php endif; ?>
+            <div class="py-12 text-center">
+                
+                <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
+                    Традиция Дандарона
+                </h1>
+                <p class="max-w-md mx-auto mt-3 text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+                    Архив работ Учителя Бидии Дандарона и его учеников, посвящённый сохранению и распространению их духовного наследия.
+                </p>
             </div>
 
             
-            <h2 class="mt-16 mb-6 text-3xl font-bold text-center text-gray-800">Новое в библиотеке</h2>
-            <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                <?php $__empty_1 = true; $__currentLoopData = $latestBooks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $book): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                    <div class="p-6 transition duration-300 bg-white rounded-lg shadow-md hover:shadow-xl">
-                        <h3 class="mb-2 text-xl font-semibold">
-                            <a href="<?php echo e(route('books.show', $book)); ?>" class="text-indigo-600 hover:underline">
-                                <?php echo e($book->title); ?>
+            <div class="grid grid-cols-1 gap-8 mt-6 md:grid-cols-2 lg:grid-cols-3">
 
-                            </a>
-                        </h3>
-                        <p class="text-sm text-gray-600">
-                            <?php if($book->publication_year): ?>
-                                Год: <?php echo e($book->publication_year); ?>
+                
+                <a href="<?php echo e(route('tradition.index')); ?>" class="block p-8 text-center transition duration-300 bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
+                    <h2 class="text-2xl font-bold text-gray-800">Традиция</h2>
+                    <p class="mt-2 text-gray-600">Преемственность, линия Учителей, история.</p>
+                </a>
 
-                            <?php endif; ?>
-                        </p>
-                    </div>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                    <p class="text-center text-gray-500 md:col-span-3">Книг пока нет.</p>
-                <?php endif; ?>
+                <a href="<?php echo e(route('authors.show', 'bidiya-dandaron')); ?>" class="block p-8 text-center transition duration-300 bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
+                    <h2 class="text-2xl font-bold text-gray-800">Б.Д. Дандарон</h2>
+                    <p class="mt-2 text-gray-600">Биография, работы, статьи об Учителе.</p>
+                </a>
+
+                <a href="<?php echo e(route('authors.index')); ?>" class="block p-8 text-center transition duration-300 bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
+                    <h2 class="text-2xl font-bold text-gray-800">Лики Традиции</h2>
+                    <p class="mt-2 text-gray-600">Ученики и последователи, их работы и воспоминания.</p>
+                </a>
+
+                <a href="<?php echo e(route('teaching.index')); ?>" class="block p-8 text-center transition duration-300 bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
+                    <h2 class="text-2xl font-bold text-gray-800">Учение</h2>
+                    <p class="mt-2 text-gray-600">Философия, Сутра, Тантра, Садханы.</p>
+                </a>
+
+                <a href="<?php echo e(route('history.index')); ?>" class="block p-8 text-center transition duration-300 bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
+                    <h2 class="text-2xl font-bold text-gray-800">История</h2>
+                    <p class="mt-2 text-gray-600">История буддизма, ключевые моменты.</p>
+                </a>
+
+                <a href="<?php echo e(route('materials.index')); ?>" class="block p-8 text-center transition
+                duration-300 bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
+                    <h2 class="text-2xl font-bold text-gray-800">Доп. материалы</h2>
+                    <p class="mt-2 text-gray-600">Материалы из других источников.</p>
+                </a>
+
             </div>
         </div>
     </div>

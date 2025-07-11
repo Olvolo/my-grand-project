@@ -6,7 +6,6 @@
 
             </h1>
 
-            
             <?php if($errors->any()): ?>
                 <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
                     <ul>
@@ -25,10 +24,13 @@
                     <label for="title" class="block text-sm font-medium text-gray-700">Заголовок</label>
                     <input type="text" name="title" id="title" value="<?php echo e(old('title', $article->title)); ?>" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
                 </div>
-
+                <div>
+                    <label for="order_column" class="block text-sm font-medium text-gray-700">Порядок сортировки</label>
+                    <input type="number" name="order_column" id="order_column" value="<?php echo e(old('order_column', $author->order_column ?? 0)); ?>" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
+                </div>
                 <div class="mt-6">
-                    <label for="content" class="block text-sm font-medium text-gray-700">Содержимое статьи (Markdown)</label>
-                    <textarea name="content_markdown" id="content_markdown" rows="15" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm"><?php echo e(old('content_markdown', $article->content_markdown)); ?></textarea>                    
+                    <label for="content_markdown" class="block text-sm font-medium text-gray-700">Содержимое статьи (Markdown)</label>
+                    <textarea name="content_markdown" id="content_markdown" rows="15" class="markdown-editor"><?php echo e(old('content_markdown', $article->content_markdown)); ?></textarea>
                 </div>
 
                 <div>
@@ -44,7 +46,7 @@
                 </div>
 
                 <div>
-                    <label for="authors" class="block text-sm font-medium text-gray-700">Авторы (можно выбрать несколько)</label>
+                    <label for="authors" class="block text-sm font-medium text-gray-700">Авторы</label>
                     <select name="authors[]" id="authors" multiple class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
                         <?php $__currentLoopData = $authors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $author): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <option value="<?php echo e($author->id); ?>" <?php if(in_array($author->id, old('authors', $article->authors->pluck('id')->toArray()))): echo 'selected'; endif; ?>>
@@ -56,7 +58,7 @@
                 </div>
 
                 <div>
-                    <label for="tags" class="block text-sm font-medium text-gray-700">Теги (можно выбрать несколько)</label>
+                    <label for="tags" class="block text-sm font-medium text-gray-700">Теги</label>
                     <select name="tags[]" id="tags" multiple class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
                         <?php $__currentLoopData = $tags; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tag): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <option value="<?php echo e($tag->id); ?>" <?php if(in_array($tag->id, old('tags', $article->tags->pluck('id')->toArray()))): echo 'selected'; endif; ?>>

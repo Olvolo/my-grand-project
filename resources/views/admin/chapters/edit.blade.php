@@ -13,12 +13,12 @@
 
                 <div>
                     <label for="title" class="block text-sm font-medium text-gray-700">Заголовок главы</label>
-                    <input type="text" name="title" id="title" value="{{ old('title', $chapter->title) }}" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
+                    <input type="text" name="title" id="title" value="{{ old('title', $chapter->title) }}" class="markdown-editor block w-full mt-1 border-gray-300 rounded-md shadow-sm">
                 </div>
 
                 <div>
                     <label for="content_markdown" class="block text-sm font-medium text-gray-700">Содержимое (Markdown)</label>
-                    <textarea name="content_markdown" id="content_markdown" rows="20" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">{{ old('content_markdown', $chapter->content_markdown) }}</textarea>
+                    <textarea name="content_markdown" id="content_markdown" rows="20" class="markdown-editor block w-full mt-1 border-gray-300 rounded-md shadow-sm">{{ old('content_markdown', $chapter->content_markdown) }}</textarea>
                 </div>
 
                 <div class="flex items-center">

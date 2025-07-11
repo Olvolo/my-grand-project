@@ -12,13 +12,14 @@
                     <input type="text" name="name" id="name" value="{{ old('name') }}" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm" required>
                 </div>
                 <div>
+                    <label for="order_column" class="block text-sm font-medium text-gray-700">Порядок сортировки</label>
+                    <input type="number" name="order_column" id="order_column" value="{{ old('order_column', $author->order_column ?? 0) }}" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
+                </div>
+                <div>
                     <label for="bio" class="block text-sm font-medium text-gray-700">Биография (Markdown)</label>
-                    <textarea name="bio" id="bio" rows="10" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">{{ old('bio') }}</textarea>
+                    <textarea name="bio" id="bio" rows="10" class="markdown-editor block w-full mt-1 border-gray-300 rounded-md shadow-sm">{{ old('bio') }}</textarea>
                 </div>
-                <div class="flex items-center">
-                    <input type="checkbox" name="is_teacher" id="is_teacher" value="1" @checked(old('is_teacher')) class="w-4 h-4 text-indigo-600 border-gray-300 rounded">
-                    <label for="is_teacher" class="ml-2 block text-sm text-gray-900">Является Учителем</label>
-                </div>
+
                 <div class="flex justify-end">
                     <button type="submit" class="px-6 py-2 font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700">
                         Создать автора

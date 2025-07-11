@@ -19,7 +19,7 @@
 
                 <div>
                     <label for="content_markdown" class="block text-sm font-medium text-gray-700">Содержимое (Markdown)</label>
-                    <textarea name="content_markdown" id="content_markdown" rows="15" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm"><?php echo e(old('content_markdown')); ?></textarea>
+                    <textarea name="content_markdown" id="content_markdown" rows="15" class="markdown-editor block w-full mt-1 border-gray-300 rounded-md shadow-sm"><?php echo e(old('content_markdown')); ?></textarea>
                 </div>
 
                 <div>

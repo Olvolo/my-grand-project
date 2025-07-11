@@ -12,7 +12,7 @@
 
                 <div>
                     <label for="title" class="block text-sm font-medium text-gray-700">Название</label>
-                    <input type="text" name="title" id="title" value="<?php echo e(old('title', $book->title)); ?>" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
+                    <input type="text" name="title" id="title" value="<?php echo e(old('title', $book->title)); ?>" class="markdown-editor block w-full mt-1 border-gray-300 rounded-md shadow-sm">
                 </div>
 
                 <div>

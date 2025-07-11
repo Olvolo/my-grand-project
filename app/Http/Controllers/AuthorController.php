@@ -12,9 +12,10 @@ class AuthorController extends Controller
      */
     public function index(): View
     {
-        // Добавляем ::query() чтобы анализатор не выдавал предупреждение
-        $authors = Author::query()->orderBy('name')
-            ->withCount(['books', 'articles'])
+        $authors = Author::query()
+            ->with('articles')
+            ->withCount(['books'])
+            ->orderBy('name')
             ->get();
 
         return view('authors.index', compact('authors'));

@@ -48,6 +48,7 @@ class BookController extends Controller
             'publisher' => 'nullable|string|max:255',
             'language' => 'nullable|string|max:10',
             'is_hidden' => 'nullable|boolean',
+            'order_column' => 'nullable|integer',
         ]);
 
         $book->update([
@@ -56,6 +57,7 @@ class BookController extends Controller
             'publisher' => $validated['publisher'],
             'language' => $validated['language'],
             'is_hidden' => $request->has('is_hidden'),
+            'order_column' => $validated['order_column'] ?? 0,
         ]);
 
         $book->authors()->sync($validated['authors']);
@@ -85,6 +87,7 @@ class BookController extends Controller
             'publisher' => 'nullable|string|max:255',
             'language' => 'nullable|string|max:10',
             'is_hidden' => 'nullable|boolean',
+            'order_column' => 'nullable|integer',
         ]);
 
         $book = Book::create([
@@ -94,6 +97,7 @@ class BookController extends Controller
             'publisher' => $validated['publisher'],
             'language' => $validated['language'],
             'is_hidden' => $request->has('is_hidden'),
+            'order_column' => $validated['order_column'] ?? 0,
         ]);
 
         $book->authors()->sync($validated['authors']);

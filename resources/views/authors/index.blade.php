@@ -1,36 +1,44 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Наши Авторы</h1>
+    <div class="py-12">
+        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Авторы и их работы</h1>
 
-    @if ($authors->isNotEmpty())
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @foreach ($authors as $author)
-                <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
-                    @if ($author->photo)
-                        <img src="{{ asset('storage/' . $author->photo) }}" alt="{{ $author->name }}"
-                             class="w-16 h-16 rounded-full object-cover border-2 border-indigo-500">
-                    @else
-                        <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold text-xl">
-                            {{ mb_substr($author->name, 0, 1) }}
+            <div class="space-y-4">
+                @forelse ($authors as $author)
+                    {{-- Ваш компонент-аккордеон --}}
+                    <div x-data="{ isOpen: false }" class="bg-white rounded-lg shadow-sm">
+                        {{-- Кликабельный заголовок --}}
+                        <div @click="isOpen = !isOpen" class="p-4 flex justify-between items-center cursor-pointer">
+                            <h3 class="text-xl font-semibold text-gray-900">{{ $author->name }}</h3>
+                            <div class="flex items-center space-x-4">
+                                @if($author->books_count > 0)
+                                    <span class="text-sm text-gray-500">Книг: {{ $author->books_count }}</span>
+                                @endif
+                                <span class="text-sm font-medium text-indigo-600" x-text="isOpen ? 'Свернуть' : 'Показать статьи'"></span>
+                            </div>
                         </div>
-                    @endif
-                    <div>
-                        <h2 class="text-xl font-semibold text-gray-800">
-                            <a href="{{ route('authors.show', $author) }}" class="hover:text-indigo-600">
-                                {{ $author->name }}
-                            </a>
-                        </h2>
-                        {{-- Этот блок будет удален, если метка не нужна --}}
-                        {{-- @if ($author->is_teacher)
-                            <span class="text-sm text-indigo-700 font-medium">Учитель</span>
-                        @endif --}}
-                        <p class="text-gray-600 text-sm mt-1">Книг: {{ $author->books->count() }}, Статей: {{ $author->articles->count() }}</p>
+
+                        {{-- Выпадающий список статей --}}
+                        <div x-show="isOpen" x-transition.duration.300ms class="border-t border-gray-200">
+                            <ul class="p-4 space-y-2">
+                                @forelse($author->articles as $article)
+                                    <li>
+                                        <a href="{{ route('articles.show', $article) }}" class="text-gray-700 hover:text-indigo-700 hover:underline">
+                                            &rarr; {{ $article->title }}
+                                        </a>
+                                    </li>
+                                @empty
+                                    <li class="text-gray-500">У этого автора пока нет статей.</li>
+                                @endforelse
+                            </ul>
+                        </div>
                     </div>
-                </div>
-            @endforeach
+                @empty
+                    <p class="text-center text-gray-600">На сайте пока нет авторов.</p>
+                @endforelse
+            </div>
         </div>
-    @else
-        <p class="text-center text-gray-600 text-lg">Пока нет зарегистрированных авторов.</p>
-    @endif
+    </div>
 @endsection

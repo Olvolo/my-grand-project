@@ -66,6 +66,7 @@ class Article extends Model
         'published_at',
         'is_hidden',
         'category_id',
+        'order_column',
     ];
 
     /**

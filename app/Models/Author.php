@@ -47,6 +47,7 @@ class Author extends Model
         'bio',
         'photo',
         'is_teacher',
+        'order_column',
     ];
 
     protected $casts = [

@@ -11,6 +11,10 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\TraditionController;
+use App\Http\Controllers\TeachingController;
+use App\Http\Controllers\HistoryController;
+use App\Http\Controllers\AdditionalMaterialsController;
 use App\Http\Controllers\Admin\ArticleController as AdminArticleController;
 use App\Http\Controllers\Admin\ChapterController as AdminChapterController;
 use App\Http\Controllers\Admin\BookController as AdminBookController;
@@ -102,5 +106,17 @@ Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->
 Route::get('/tags/{tag:slug}', [TagController::class, 'show'])->name('tags.show');
 
 // Поиск и Контакты
-Route::get('/search', [SearchController::class, 'index'])->name('search');
+Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 Route::view('/contacts', 'pages.contacts')->name('contacts');
+
+// Традиция
+Route::get('/tradition', [TraditionController::class, 'index'])->name('tradition.index');
+
+// Учение
+Route::get('/teaching', [TeachingController::class, 'index'])->name('teaching.index');
+
+// История
+Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
+
+// Дополнительные материалы
+Route::get('/materials', [AdditionalMaterialsController::class, 'index'])->name('materials.index');

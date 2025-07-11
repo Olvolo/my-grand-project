@@ -42,6 +42,7 @@ class AuthorController extends Controller
             'name' => 'required|string|max:255|unique:authors,name',
             'bio' => 'nullable|string',
             'is_teacher' => 'nullable|boolean',
+            'order_column' => 'nullable|integer',
         ]);
 
         // Исправляем вызов, чтобы удовлетворить анализатор
@@ -50,6 +51,7 @@ class AuthorController extends Controller
             'slug' => Str::slug($validated['name']),
             'bio' => $validated['bio'],
             'is_teacher' => $request->has('is_teacher'),
+            'order_column' => $validated['order_column'] ?? 0,
         ]);
 
         return redirect()->route('admin.authors.index')->with('success', 'Автор успешно создан!');
@@ -72,12 +74,14 @@ class AuthorController extends Controller
             'name' => ['required', 'string', 'max:255', Rule::unique('authors')->ignore($author->id)],
             'bio' => 'nullable|string',
             'is_teacher' => 'nullable|boolean',
+            'order_column' => 'nullable|integer',
         ]);
 
         $author->update([
             'name' => $validated['name'],
             'bio' => $validated['bio'],
             'is_teacher' => $request->has('is_teacher'),
+            'order_column' => $validated['order_column'] ?? 0,
         ]);
 
         return redirect()->route('admin.authors.index')->with('success', 'Данные автора успешно обновлены!');

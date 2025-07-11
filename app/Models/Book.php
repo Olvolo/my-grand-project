@@ -62,6 +62,7 @@ class Book extends Model
         'language',
         'publisher',
         'is_hidden',
+        'order_column',
     ];
 
     protected $casts = [
