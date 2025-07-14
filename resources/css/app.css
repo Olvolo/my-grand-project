@@ -1,6 +1,61 @@
+/* ДОБАВЬТЕ В САМЫЙ ВЕРХ ФАЙЛА resources/css/app.css */
+
+/* ВРЕМЕННЫЕ ОТЛАДОЧНЫЕ СТИЛИ - УДАЛИТЬ ПОСЛЕ ДИАГНОСТИКИ */
+body {
+    background-color: #f0f0f0 !important;
+}
+{
+    box-sizing: border-box !important;
+}
+
+html {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    border: 2px solid blue !important;
+}
+
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    border: 5px solid purple !important;
+}
+
+/* Проверим основной контейнер */
+.min-h-screen {
+    border: 3px solid yellow !important;
+    width: 100% !important;
+}
+
+/* Проверим навигацию */
+nav {
+    border: 5px solid red !important;
+    width: 100% !important;
+}
+main {
+    border: 3px solid red !important; /* Убедимся, что main совпадает с nav */
+}
+
+main > div {
+    border: 1px dashed orange !important; /* Проверка внутреннего контейнера */
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-gray-100 text-gray-900;
+    }
+}
+
+@layer components {
+    .card {
+        @apply p-6 bg-white rounded-lg shadow hover:shadow-lg transition transform hover:-translate-y-1;
+    }
+}
 
 /* Custom styles for elements within prose, especially for footnotes and tables */
 .prose {
