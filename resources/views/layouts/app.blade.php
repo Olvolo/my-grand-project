@@ -16,7 +16,7 @@
 @include('layouts.navigation')
 
 {{-- Основной контент - занимает всю ширину и высоту, заполняет оставшееся пространство --}}
-<main class="flex-grow w-full bg-cover bg-center bg-no-repeat relative" style="background-image: url('{{ asset('images/Pan_cut_compressed.webp') }}');">
+<main class="flex-grow w-full bg-cover bg-center bg-no-repeat relative" style="background-image: url('{{ asset('images/main_background.webp') }}');">
     {{-- Затемнение для лучшей читаемости --}}
     <div class="absolute inset-0 bg-black/20"></div>
 
@@ -27,7 +27,7 @@
 </main>
 
 {{-- Подвал - фон на всю ширину, текст центрирован --}}
-<footer class="w-full bg-gray-800 text-white py-6">
+<footer class="w-full bg-sky-900 text-brand-cream py-6">
     <div class="text-center">
         &copy; {{ date('Y') }} {{ config('app.name', 'Традиция Дандарона') }}. Все права защищены.
     </div>

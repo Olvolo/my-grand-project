@@ -57,7 +57,7 @@ $width = match ($width) {
             class="absolute z-50 mt-2 <?php echo e($width); ?> rounded-md shadow-lg <?php echo e($alignmentClasses); ?>"
             style="display: none;"
             @click="open = false">
-        <div class="rounded-md ring-1 ring-black ring-opacity-5 <?php echo e($contentClasses); ?>">
+        <div class="rounded-md border border-amber-500/50 bg-sky-800/95 backdrop-blur-md shadow-lg <?php echo e($contentClasses); ?>">
             <?php echo e($content); ?>
 
         </div>

@@ -16,7 +16,7 @@
 <?php echo $__env->make('layouts.navigation', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 
-<main class="flex-grow w-full bg-cover bg-center bg-no-repeat relative" style="background-image: url('<?php echo e(asset('images/Pan_cut_compressed.webp')); ?>');">
+<main class="flex-grow w-full bg-cover bg-center bg-no-repeat relative" style="background-image: url('<?php echo e(asset('images/main_background.webp')); ?>');">
     
     <div class="absolute inset-0 bg-black/20"></div>
 
@@ -27,7 +27,7 @@
 </main>
 
 
-<footer class="w-full bg-gray-800 text-white py-6">
+<footer class="w-full bg-sky-900 text-brand-cream py-6">
     <div class="text-center">
         &copy; <?php echo e(date('Y')); ?> <?php echo e(config('app.name', 'Традиция Дандарона')); ?>. Все права защищены.
     </div>

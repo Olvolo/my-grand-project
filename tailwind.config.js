@@ -18,6 +18,15 @@ export default {
                 // Использование Instrument Sans в качестве основного sans-serif
                 sans: ['Instrument Sans', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                'brand-gold': '#facc15',      // Ярко-жёлтый (Солнце)
+                'brand-blue': '#1e3a8a',      // Глубокий синий (Небо)
+                'brand-cream': '#fffacc',     // Кремовый (Для текста)
+                'brand-slate': '#1e293b',     // Графитовый (Для фона карточек)
+                'welcome-card': '#4ca4b5',
+                'welcome-card-text': '#bcc2be',
+                'welcome-card-hover': '#61cbf2',
+            },
         },
     },
 
